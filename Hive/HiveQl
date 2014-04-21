@@ -1,0 +1,62 @@
+							Hive
+
+Creating Table:
+
+CREATE TABLE user(id INT, age INT,gender STRING,profile STRING, zip INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY ‘\|’ STORED AS TEXTFILE;
+
+create table data(user_id INT,item_id INT,rating INT,timestamp TIMESTAMP) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' STORED AS TEXTFILE;
+
+create table item(movie_id STRING,movie_name STRING,release_date STRING,empty STRING,imdb_url STRING, unknown INT, Action INT, Adventure INT, Animation INT, Children INT, Comedy INT, Crime INT, Documentary INT, Drama INT, Fantasy INT, Film_Noir INT, Horror INT, Musical INT, Mystery INT, Romance INT, Sci_Fi INT, Thriller INT, War INT, Western INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\|' STORED AS TEXTFILE;
+
+Loading Data:
+
+LOAD DATA INPATH '/home/ashok/opt/hadoop/data/file/u.data' OVERWRITE INTO TABLE data_1;
+
+LOAD DATA INPATH '/home/ashok/opt/hadoop/data/file/u.user' OVERWRITE INTO TABLE data_1;
+
+LOAD DATA INPATH '/home/ashok/opt/hadoop/data/file/u.item' OVERWRITE INTO TABLE data_1;
+
+
+Hive 1:
+
+ADD JAR /home/ashok/Documents/workspace-sts-3.3.0.RELEASE/isnumeric/target/isnumeric-0.0.1-SNAPSHOT.jar;
+
+CREATE TEMPORARY FUNCTION numeric as 'com.hive.udf.isnumeric.IsNumeric';
+
+select movie_id,numeric(movie_name) from item;
+
+Hive 2:
+
+select movie_id, movie_name,release_date from item where release_date like '01-Jan-%';
+
+Hive 3:
+
+select movie_id,movie_name,data.item_id as ITEMID, user_id as USERID, rating as RATING from data join item where item.movie_id = data.item_id and user_id = 210;
+
+Hive 5:
+select distinct item_id,age,movie_id, movie_name from user join data on(user.id = data.item_id) join item on (data.item_id = item.movie_id) where profile like 'scientist' and romance = 1;
+
+Hive 6:
+
+select distinct item_id,age,movie_id, movie_name from user join data on(user.id = data.item_id) join item on (data.item_id = item.movie_id) where age >40 and animation = 1;
+
+Hive 7:
+select distinct item_id,age,movie_id, movie_name from user join data on(user.id = data.item_id) join item on (data.item_id = item.movie_id) where age <=15 and horror =1;
+
+Hive 8:
+select item_id, max(rating) from data join item where item.documentary = 1 and item.movie_id = data.item_id group by item_id,data.rating having data.rating = 5;
+
+
+Hive 9:
+
+select item_id, min(rating) from data join item where item.romance = 1 and item.movie_id = data.item_id group by item_id,data.rating having data.rating = 1;
+
+
+Hive 10:
+
+select movie_id,movie_name,release_date from item where item.film_noir =1 and release_date <= '01-Jan-1951';
+
+
+
+
+
